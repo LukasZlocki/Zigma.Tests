@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Zigma.Models;
 using Zigma.TransformationTools;
-using System.ComponentModel;
 
 namespace Zigma.Tests
 {
@@ -90,6 +89,41 @@ namespace Zigma.Tests
             TransformationTool transform = new();
             actualModel.CreateZigmaDatasetFromRawDataset(TestSet);
             actualModel = transform.ColumnExtract(actualModel, 1);
+
+            // Assert
+            Assert.Equal(expectedModel.GetRawZigmaDataset(), actualModel.GetRawZigmaDataset());
+        }
+
+         [Fact]
+        public void RemoveRecurrenceData_ShouldReturnRemovedRecurrenceDataAsZigmaModel()
+        {
+            // Arrange
+            List<string[]> TestSet = new List<string[]>{
+                new string[] {"aa", "Date" , "cc", "dd"},
+                new string[] {"ee", "2022-02-21", "gg", "hh"},
+                new string[] {"ee", "2022-02-21", "gg", "hh"},
+                new string[] {"ii", "2022-02-22", "kk", "ll"},
+                new string[] {"ii", "2022-02-23", "kk", "ll"},
+                new string[] {"ii", "2022-02-24", "kk", "ll"},
+                new string[] {"ii", "2022-02-22", "kk", "ll"}
+            };
+
+            List<string[]> ExpectedSet = new List<string[]>
+            {
+                new string[] {"aa", "Date" , "cc", "dd"},
+                new string[] {"ee", "2022-02-21", "gg", "hh"},
+                new string[] {"ii", "2022-02-22", "kk", "ll"},
+                new string[] {"ii", "2022-02-23", "kk", "ll"},
+                new string[] {"ii", "2022-02-24", "kk", "ll"}
+            };
+            ZigmaModel expectedModel = new();
+            expectedModel.CreateZigmaDatasetFromRawDataset(ExpectedSet);
+
+            // Act
+            ZigmaModel actualModel = new();
+            TransformationTool transform = new();
+            actualModel.CreateZigmaDatasetFromRawDataset(TestSet);
+            actualModel = transform.RemoveRecurrenceData(actualModel, 1);
 
             // Assert
             Assert.Equal(expectedModel.GetRawZigmaDataset(), actualModel.GetRawZigmaDataset());
